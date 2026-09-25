@@ -1,0 +1,76 @@
+@import "@fontsource/archivo/400.css";
+@import "@fontsource/archivo/600.css";
+@import "@fontsource/archivo/800.css";
+@import "tailwindcss";
+
+/* Archassist design tokens (from the Claude Design screen guide) */
+@theme {
+  --font-sans: "Archivo", system-ui, sans-serif;
+  --color-ink: #201e1d;
+  --color-ink-2: #444141;
+  --color-muted: #605d5d;
+  --color-muted-2: #7d7979;
+  --color-paper: #f3f2f2;
+  --color-paper-2: #eae9e9;
+  --color-field: #f8f4f4;
+  --color-accent: #ec3013;
+  --color-accent-hover: #dd2b0f;
+  --color-accent-dark: #ae1800;
+  --color-tint: #ffe0d9;
+  --color-tint-ink: #7c1405;
+  --color-rule: rgb(32 30 29 / 0.4);
+  --color-rule-soft: rgb(32 30 29 / 0.25);
+}
+
+@layer base {
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  a { color: var(--color-accent); text-underline-offset: 3px; }
+  a:hover { color: var(--color-accent-dark); }
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  ::selection { background: rgb(236 48 19 / 0.28); }
+  input[type="range"] { accent-color: var(--color-accent); }
+}
+
+/* Type */
+@utility kicker { @apply text-[11px] leading-none tracking-[.14em] uppercase text-accent; }
+@utility eyebrow { @apply text-[11px] leading-none tracking-[.12em] uppercase text-ink-2; }
+@utility field-label { @apply mb-[7px] block text-[11px] leading-none tracking-[.1em] uppercase text-ink-2; }
+@utility th { @apply text-[11px] font-extrabold leading-tight tracking-[.08em] uppercase; }
+@utility display { @apply font-extrabold tracking-[-.025em]; }
+
+/* Controls */
+@utility field {
+  @apply w-full rounded-none border-2 border-ink bg-field px-[13px] py-3 text-sm text-ink placeholder:text-muted-2;
+}
+@utility btn {
+  @apply inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-none px-[18px] py-[13px] text-[13px] font-extrabold leading-tight whitespace-nowrap transition-colors
+    disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary { @apply btn border-0 bg-accent text-white hover:bg-accent-hover hover:text-white; }
+@utility btn-outline { @apply btn border-2 border-ink bg-transparent text-ink hover:bg-ink hover:text-paper; }
+@utility btn-link {
+  @apply cursor-pointer border-0 bg-transparent p-0 text-[13px] font-semibold text-accent underline underline-offset-4 hover:text-accent-dark;
+}
+
+/* Chips */
+@utility chip { @apply inline-flex items-center gap-2 px-2.5 py-1.5 text-xs leading-tight font-semibold; }
+@utility chip-accent { @apply chip bg-tint text-tint-ink; }
+@utility chip-muted { @apply chip border border-rule bg-paper-2 text-ink-2; }
+@utility tag { @apply inline-block border border-rule bg-paper-2 px-2 py-1 text-[11px] leading-tight font-semibold tracking-[.04em] uppercase whitespace-nowrap; }
+
+/* Rules */
+@utility rule-top { border-top: 2px solid var(--color-rule); }
+@utility rule-top-soft { border-top: 1px solid var(--color-rule-soft); }
+
+@keyframes pulse-num { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@utility animate-pulse-num { animation: pulse-num 1.1s ease-in-out infinite; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+}
