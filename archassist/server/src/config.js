@@ -24,8 +24,8 @@ export const config = {
   llm: {
     provider: process.env.LLM_PROVIDER ?? 'auto',
     anthropicApiKey: process.env.ANTHROPIC_API_KEY ?? '',
-    anthropicModel: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-5',
-    maxTokens: Number(process.env.LLM_MAX_TOKENS ?? 4000),
+    anthropicModel: process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-5',
+    maxTokens: Number(process.env.LLM_MAX_TOKENS ?? 8000),
   },
 
   // Embedding provider: "local" (no key, runs offline), "voyage", or "openai".

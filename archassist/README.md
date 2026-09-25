@@ -57,6 +57,10 @@ npm run dev:server           # API on http://localhost:4000
 npm run dev:client           # UI  on http://localhost:5173
 ```
 
+**Ports already in use?** Copy `client/.env.example` to `client/.env` and set `CLIENT_PORT` (e.g. `5180`).
+If port 4000 is also taken, set `PORT` in `server/.env` and the matching `API_URL` in `client/.env`.
+The browser only talks to the Vite dev server, which proxies `/api` to the API, so `CORS_ORIGIN` does not need to change.
+
 Default admin: `admin@archassist.local` / `admin12345` (change via `ADMIN_EMAIL` / `ADMIN_PASSWORD` before first run).
 Students create their own accounts on the Register page.
 
@@ -67,7 +71,7 @@ knowledge. To enable Claude, set in `server/.env`:
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
-ANTHROPIC_MODEL=claude-sonnet-4-5    # any current Claude model id
+ANTHROPIC_MODEL=claude-sonnet-5    # any current Claude model id
 ```
 
 If the LLM call fails, the system automatically falls back to offline mode and records the error on the report.

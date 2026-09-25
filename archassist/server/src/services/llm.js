@@ -97,7 +97,9 @@ Rules:
 - Address every quality attribute the student prioritised (priority > 0).
 - Do NOT write or include application source code, code snippets, configuration files, or pseudo-code. Describe structure and decisions in prose only.
 - Write clearly for a student audience. Be specific to this project; avoid generic filler.
-- Respond only by calling the submit_recommendation tool.`;
+- In all prose fields, refer to knowledge entries by name, never by entry number; entry ids belong only in "entry_id" and "references".
+- Keep it focused: rationale up to 3 short paragraphs, 3–4 alternatives, 3–6 risks, 3–6 next steps.
+- Respond only by calling the submit_recommendation tool, and always fill every required field (including "references").`;
 
 function formatContext(profile, matrix, retrieved) {
   const qa = profile.ranked_quality_attributes.map((q) => `- ${q.label}: ${q.priority}/5`).join('\n') || '- (none prioritised)';
@@ -140,6 +142,28 @@ Constraints: ${project.constraints || '-'}
 Technology preferences: ${project.tech_preferences || '-'}`;
 }
 
+/**
+ * Make sure an LLM report always has every field the UI relies on, even if the
+ * model skipped an optional-looking one. Unknown/invalid references are dropped.
+ */
+export function normalizeReport(raw, retrieved) {
+  const r = { ...raw };
+  const arr = (v) => (Array.isArray(v) ? v : []);
+  const known = new Map(retrieved.entries.map((e) => [e.id, e.title]));
+  r.recommended_architecture = { name: 'Unnamed architecture', summary: '', ...(r.recommended_architecture ?? {}) };
+  if (!known.has(r.recommended_architecture.entry_id)) r.recommended_architecture.entry_id = null;
+  r.confidence = ['high', 'medium', 'low'].includes(r.confidence) ? r.confidence : 'medium';
+  r.rationale = typeof r.rationale === 'string' ? r.rationale : '';
+  for (const k of ['quality_attribute_analysis', 'high_level_structure', 'recommended_patterns', 'alternatives',
+    'tradeoffs_and_risks', 'implementation_guidance']) r[k] = arr(r[k]);
+  r.quality_attribute_analysis = r.quality_attribute_analysis.map((q) => ({ tactics: [], support: 'moderate', explanation: '', ...q, tactics: arr(q.tactics) }));
+  r.references = arr(r.references).filter((ref) => known.has(ref.entry_id));
+  if (r.references.length === 0) {
+    r.references = retrieved.entries.slice(0, 6).map((e) => ({ entry_id: e.id, title: e.title }));
+  }
+  return r;
+}
+
 async function anthropicRecommend({ project, profile, matrix, retrieved }) {
   const client = new Anthropic({ apiKey: config.llm.anthropicApiKey });
   const response = await client.messages.create({
@@ -157,9 +181,12 @@ async function anthropicRecommend({ project, profile, matrix, retrieved }) {
       content: `${projectDetails(project)}\n\n${formatContext(profile, matrix, retrieved)}\n\nRecommend an architecture for this project.`,
     }],
   });
+  if (response.stop_reason === 'max_tokens') {
+    throw new Error(`LLM output was cut off at ${config.llm.maxTokens} tokens; raise LLM_MAX_TOKENS`);
+  }
   const toolUse = response.content.find((b) => b.type === 'tool_use');
   if (!toolUse) throw new Error('LLM did not return a structured recommendation');
-  return { report: toolUse.input, model: response.model, usage: response.usage };
+  return { report: normalizeReport(toolUse.input, retrieved), model: response.model, usage: response.usage };
 }
 
 // ---------------------------------------------------------------------------

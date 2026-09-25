@@ -44,3 +44,13 @@ test('seed knowledge is well-formed', () => {
   assert.ok(chunks.length >= 2);
   assert.ok(chunks.every((c) => c.startsWith(styles[0].title)));
 });
+
+test('normalizeReport fills missing fields and drops unknown references', async () => {
+  const { normalizeReport } = await import('../src/services/llm.js');
+  const retrieved = { entries: [{ id: 7, title: 'Layered' }, { id: 9, title: 'Caching' }] };
+  const r = normalizeReport({ recommended_architecture: { name: 'Layered', entry_id: 99 }, confidence: 'sure', references: [{ entry_id: 42, title: 'x' }] }, retrieved);
+  assert.equal(r.recommended_architecture.entry_id, null);
+  assert.equal(r.confidence, 'medium');
+  assert.deepEqual(r.alternatives, []);
+  assert.deepEqual(r.references.map((x) => x.entry_id), [7, 9]);
+});

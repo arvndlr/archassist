@@ -287,7 +287,7 @@ export default function ProjectForm() {
     const started = Date.now();
     timer.current = setInterval(() => setRun((r) => (r && r.step < 3 ? {
       step: r.step + 1,
-      ticker: r.step + 1 === 2 ? 'Searching styles, patterns and tactics (vector + full-text)…' : 'Scoring candidates and drafting rationale…',
+      ticker: r.step + 1 === 2 ? 'Searching styles, patterns and tactics (vector + full-text)…' : 'Scoring candidates and drafting rationale… the LLM step can take up to a minute.',
     } : r)), 900);
     try {
       const payload = toPayload(form);

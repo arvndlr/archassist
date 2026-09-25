@@ -4,7 +4,7 @@ import { query, withTransaction } from '../db/pool.js';
 import { fitScore } from '../db/sql.js';
 import { analyzeProject } from './analyzer.js';
 import { retrieveKnowledge, buildDecisionMatrix, ensureTopStylesInContext } from './retriever.js';
-import { generateRecommendation } from './llm.js';
+import { generateRecommendation, normalizeReport } from './llm.js';
 
 const PROJECT_FIELDS = ['title', 'description', 'domain', 'project_type', 'functional_requirements', 'expected_users',
   'team_size', 'team_experience', 'timeline_weeks', 'deployment', 'constraints', 'tech_preferences'];
@@ -104,7 +104,9 @@ export async function getRecommendation(id) {
     `SELECT r.*, p.user_id, p.title AS project_title FROM recommendations r JOIN projects p ON p.id = r.project_id WHERE r.id = $1`,
     [id],
   );
-  return rows[0] ?? null;
+  const rec = rows[0];
+  if (!rec) return null;
+  return { ...rec, report: normalizeReport(rec.report, rec.retrieved) };
 }
 
 export async function listRecommendations(projectId) {
