@@ -46,7 +46,7 @@ red accent `#ec3013`, square corners and 2px rules. Design tokens live in `clien
 
 ## Getting started
 
-Requirements: Node.js 20+, and either Docker or a local PostgreSQL 16 with the `pgvector` extension.
+Requirements: Node.js 20.19+ or 22.12+ (22 LTS recommended), and either Docker or a local PostgreSQL 16 with the `pgvector` extension.
 
 ```bash
 npm run install:all          # install server + client
@@ -80,6 +80,21 @@ If the LLM call fails, the system automatically falls back to offline mode and r
 
 Set `EMBEDDING_PROVIDER=voyage` (with `VOYAGE_API_KEY`) or `openai` (with `OPENAI_API_KEY`), then run
 `npm --prefix server run reindex` (or click **Re-index** in the admin overview). Vectors from different models are never mixed.
+
+## Deploy for free (Render + Neon)
+
+One free Render web service runs the API **and** serves the built React app; the database is a free Neon Postgres
+(pgvector included). On first start the server creates the tables, the admin account and the knowledge base.
+
+1. **Neon** (neon.com) → create a project → in the SQL editor run `CREATE EXTENSION IF NOT EXISTS vector;` →
+   copy the connection string (it ends with `?sslmode=require`).
+2. **Render** (render.com) → New → **Blueprint** → pick this GitHub repo (uses `render.yaml`).
+   If the code is inside a subfolder, set that folder as the **Root Directory**.
+3. Fill in the secret env vars Render asks for: `DATABASE_URL` (Neon), `ADMIN_PASSWORD`, `ANTHROPIC_API_KEY`.
+4. Deploy, then open `https://<service>.onrender.com`.
+
+Free-tier notes: the service sleeps after 15 minutes idle and takes about a minute to wake up; Neon suspends
+after 5 minutes idle and wakes in about a second.
 
 ## API overview
 

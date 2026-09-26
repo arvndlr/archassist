@@ -1,4 +1,9 @@
 import 'dotenv/config';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const clientDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist');
 
 function required(name, fallback) {
   const value = process.env[name] ?? fallback;
@@ -13,6 +18,9 @@ export const config = {
   jwtSecret: required('JWT_SECRET', process.env.NODE_ENV === 'production' ? undefined : 'dev-only-change-me'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  // In production the API also serves the built React app (one service, one URL).
+  clientDist,
+  serveClient: process.env.SERVE_CLIENT === 'true' || (process.env.NODE_ENV === 'production' && fs.existsSync(clientDist)),
 
   admin: {
     name: process.env.ADMIN_NAME ?? 'Archassist Admin',
