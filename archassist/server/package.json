@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node --test test/*.test.js",
+    "test": "node --test",
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
     "migrate": "node src/db/migrate.js",
@@ -17,6 +17,7 @@
   "type": "module",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",
+    "archassist": "file:..",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",
